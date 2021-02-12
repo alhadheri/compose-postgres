@@ -1,0 +1,35 @@
+# Docker
+# Build a Docker image 
+# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
+
+trigger:
+- main
+
+resources:
+  containers:
+  - container: my_container
+    image: ubuntu:16.04
+  - container: pg11
+    image: postgres:11
+  - container: pg10
+    image: postgres:10
+
+pool:
+  vmImage: 'ubuntu-16.04'
+
+strategy:
+  matrix:
+    postgres11:
+      postgresService: pg11
+    postgres10:
+      postgresService: pg10
+
+container: my_container
+
+services:
+  postgres: $[ variables['postgresService'] ]
+
+steps:
+- script: |
+    apt install -y postgresql-client
+    psql --host=postgres --username=postgres --command="SELECT 1;"
